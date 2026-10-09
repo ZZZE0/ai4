@@ -10,6 +10,7 @@
 - 模块 1 · 点迹聚类：:class:`Point3D`（数据类型.md 2.1）、:class:`Cluster`（2.2）；
 - 模块 8 · 状态机（话题消息级输入）：:class:`DetectedTarget`（1.1）、
   :class:`VisualTrack`（1.3）、:class:`Track`（1.5）。
+- 模块 3 · 导航：:class:`Waypoint`（最小位置航点）。
 
 后续模块的 ``TrackState``、``Detection`` 等亦应加入本文件。
 
@@ -23,7 +24,17 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import List, Tuple
 
-__all__ = ["Point3D", "Cluster", "DetectedTarget", "VisualTrack", "Track"]
+import numpy as np
+
+__all__ = [
+    "Point3D",
+    "Cluster",
+    "DetectedTarget",
+    "VisualTrack",
+    "Track",
+    "TrackState",
+    "Waypoint",
+]
 
 
 @dataclass
@@ -97,3 +108,27 @@ class Track:
     velocity: Tuple[float, float, float]
     covariance: Tuple[float, ...]
     age: int
+
+
+@dataclass
+class TrackState:
+    """内部卡尔曼航迹状态（``design/数据类型.md`` 2.3）。
+
+    ``state`` 的六个元素依次为 ``[x, y, z, vx, vy, vz]``，``cov`` 为对应
+    的 6x6 协方差矩阵。该结构只供纯算法层使用，不是 ROS 消息。
+    """
+
+    id: int
+    state: np.ndarray
+    cov: np.ndarray
+    age: int
+    last_update: float
+
+
+@dataclass
+class Waypoint:
+    """导航位置航点（模块 3 第一版最小字段）。"""
+
+    x: float
+    y: float
+    z: float
